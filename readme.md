@@ -101,4 +101,59 @@ Nous utilisons une adaptation du modèle GitFlow pour notre workflow de dévelop
 
 ## Dépendances
 
-Voir `requirements.txt` pour la liste complète des dépendances.
+Les principales dépendances du projet sont les suivantes :
+
+1. **PyQt5** : Interface graphique
+
+   - `pip install PyQt5`
+
+2. **pandas** : Manipulation et analyse de données
+
+   - `pip install pandas`
+
+3. **matplotlib** : Création de graphiques statiques
+
+   - `pip install matplotlib`
+
+4. **seaborn** : Amélioration des visualisations
+
+   - `pip install seaborn`
+
+5. **python-dateutil** : Manipulation avancée des dates
+
+   - `pip install python-dateutil`
+
+6. **numpy** : Calculs numériques
+
+   - `pip install numpy`
+
+7. **simplejson** : Manipulation avancée de JSON
+
+   - `pip install simplejson`
+
+8. **yfinance** (optionnel) : Données boursières réelles
+
+   - `pip install yfinance`
+
+9. **pytest** : Tests unitaires et d'intégration
+
+   - `pip install pytest`
+
+10. **black** : Formatage du code
+
+    - `pip install black`
+
+11. **flake8** : Linting du code
+
+    - `pip install flake8`
+
+12. **python-dotenv** : Gestion des variables d'environnement
+    - `pip install python-dotenv`
+
+Pour installer toutes les dépendances en une seule commande, utilisez :
+
+```
+pip install -r requirements.txt
+```
+
+Voir `requirements.txt` pour la liste complète et les versions spécifiques des dépendances.
