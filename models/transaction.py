@@ -1,5 +1,3 @@
-# transaction.py
-
 from datetime import datetime
 
 class Transaction:

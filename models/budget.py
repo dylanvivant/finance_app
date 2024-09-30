@@ -1,5 +1,3 @@
-# budget.py
-
 from datetime import datetime
 
 class Budget:

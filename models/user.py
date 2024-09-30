@@ -1,5 +1,3 @@
-# user.py
-
 from datetime import datetime
 
 class User:

@@ -1,5 +1,3 @@
-# stock.py
-
 from datetime import datetime
 
 class Stock:
