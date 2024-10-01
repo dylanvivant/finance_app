@@ -3,7 +3,6 @@ from datetime import datetime
 from models.user import User
 from models.transaction import Transaction
 from models.budget import Budget
-from models.stock import Stock
 
 def test_user_creation():
     user = User(1, "testuser", "test@example.com")
@@ -26,12 +25,6 @@ def test_add_budget():
     assert len(user.budgets) == 1
     assert user.budgets[0] == budget
 
-def test_add_stock():
-    user = User(1, "testuser", "test@example.com")
-    stock = Stock(1, 1, "AAPL", "Apple Inc.", 10, 150.0)
-    user.add_stock(stock)
-    assert len(user.stocks) == 1
-    assert user.stocks[0] == stock
 
 def test_get_balance():
     user = User(1, "testuser", "test@example.com")

@@ -18,8 +18,8 @@ finance_app/
 ├── models/                 # Modèles de données
 │   ├── user.py
 │   ├── transaction.py
-│   ├── budget.py
-│   └── stock.py
+│   └── budget.py
+│
 │
 ├── services/               # Services métier
 │   ├── finance_manager.py
@@ -29,12 +29,11 @@ finance_app/
 │
 ├── gui/                    # Interface graphique
 │   ├── main_window.py
-│   ├── finance_view.py
-│   └── stock_view.py
+│   └── finance_view.py
+│
 │
 └── data/                   # Stockage des données
-    ├── user_data.json
-    └── stock_data.json
+    └── user_data.json
 ```
 
 ## Fonctionnalités Principales

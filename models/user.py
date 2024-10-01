@@ -20,7 +20,6 @@ class User:
         self.created_at = created_at if created_at else datetime.now()
         self.transactions = []  # Liste pour stocker les transactions de l'utilisateur
         self.budgets = []  # Liste pour stocker les budgets de l'utilisateur
-        self.stocks = []  # Liste pour stocker les actions de l'utilisateur
 
     def add_transaction(self, transaction):
         """
@@ -37,14 +36,6 @@ class User:
         :param budget: Objet Budget à ajouter
         """
         self.budgets.append(budget)
-
-    def add_stock(self, stock):
-        """
-        Ajoute une action à la liste des actions de l'utilisateur.
-
-        :param stock: Objet Stock à ajouter
-        """
-        self.stocks.append(stock)
 
     def get_balance(self):
         """
