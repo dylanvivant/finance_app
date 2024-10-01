@@ -1,7 +1,10 @@
 from models.budget import Budget
 from models.user import User
+from models.transaction import Transaction
 from typing import List, Dict
 from datetime import datetime
+import logging
+
 
 class BudgetManager:
     """
@@ -15,6 +18,8 @@ class BudgetManager:
         :param user: L'utilisateur dont les budgets sont gérés
         """
         self.user = user
+        logging.debug(f"BudgetManager initialized for user: {user.username}")
+
 
     def create_budget(self, category: str, amount: float, period_start: datetime, period_end: datetime) -> Budget:
         """
@@ -35,6 +40,7 @@ class BudgetManager:
             period_end=period_end
         )
         self.user.add_budget(budget)
+        logging.debug(f"Created new budget: {budget}")
         return budget
 
     def get_budget_by_category(self, category: str) -> List[Budget]:
@@ -44,20 +50,10 @@ class BudgetManager:
         :param category: La catégorie à filtrer
         :return: Une liste des budgets de la catégorie spécifiée
         """
-        return [b for b in self.user.budgets if b.category == category]
-
-    def update_budget_spent(self, category: str, amount: float):
-        """
-        Met à jour le montant dépensé pour tous les budgets actifs d'une catégorie.
-        
-        :param category: La catégorie du budget à mettre à jour
-        :param amount: Le montant à ajouter aux dépenses
-        """
-        now = datetime.now()
-        for budget in self.user.budgets:
-            if budget.category == category and budget.period_start <= now <= budget.period_end:
-                budget.add_expense(amount)
-
+        budgets = [b for b in self.user.budgets if b.category == category]
+        logging.debug(f"Retrieved budgets for category {category}: {budgets}")
+        return budgets
+    
     def get_budget_status(self) -> Dict[str, Dict[str, float]]:
         """
         Retourne le statut de tous les budgets actifs.
@@ -74,3 +70,44 @@ class BudgetManager:
                     "remaining": budget.get_remaining()
                 }
         return status
+        
+
+    def update_budget_spent(self, category: str, amount: float):
+        """
+        Met à jour le montant dépensé pour tous les budgets actifs d'une catégorie.
+        
+        :param category: La catégorie du budget à mettre à jour
+        :param amount: Le montant à ajouter aux dépenses (négatif pour les dépenses)
+        """
+        now = datetime.now()
+        logging.debug(f"Updating budget spent for category: {category}, amount: {amount}")
+        for budget in self.user.budgets:
+            if budget.category == category and budget.period_start <= now <= budget.period_end:
+                old_spent = budget.spent
+                budget.add_expense(amount)
+                logging.debug(f"Budget updated: category={category}, old_spent={old_spent}, new_spent={budget.spent}")
+
+    def handle_transaction_deletion(self, transaction: Transaction):
+        """
+        Met à jour les budgets suite à la suppression d'une transaction.
+        
+        :param transaction: La transaction supprimée
+        """
+        logging.debug(f"Handling deletion of transaction: {transaction}")
+        if transaction.is_expense():
+            self.update_budget_spent(transaction.category, -transaction.amount)
+        logging.debug(f"After deletion, budget spent: {self.get_budget_by_category(transaction.category)[0].spent}")
+
+    def handle_transaction_update(self, old_transaction: Transaction, new_transaction: Transaction):
+        """
+        Met à jour les budgets suite à la modification d'une transaction.
+        
+        :param old_transaction: L'ancienne version de la transaction
+        :param new_transaction: La nouvelle version de la transaction
+        """
+        logging.debug(f"Handling update of transaction: Old={old_transaction}, New={new_transaction}")
+        if old_transaction.is_expense():
+            self.update_budget_spent(old_transaction.category, -old_transaction.amount)
+        if new_transaction.is_expense():
+            self.update_budget_spent(new_transaction.category, new_transaction.amount)
+        logging.debug(f"After update, budget spent: {self.get_budget_by_category(new_transaction.category)[0].spent}")

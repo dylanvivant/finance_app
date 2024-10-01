@@ -1,4 +1,6 @@
 from datetime import datetime
+import logging
+
 
 class Budget:
     """
@@ -22,15 +24,18 @@ class Budget:
         self.amount = amount
         self.period_start = period_start
         self.period_end = period_end
-        self.spent = 0  # Montant dépensé, initialisé à 0
+        self.spent = 0
+        logging.debug(f"Budget initialized: {self}")
 
     def add_expense(self, amount):
         """
         Ajoute une dépense au budget.
 
-        :param amount: Montant de la dépense à ajouter
+        :param amount: Montant de la dépense à ajouter (devrait être négatif)
         """
+        old_spent = self.spent
         self.spent += amount
+        logging.debug(f"Expense added to budget {self.budget_id}: old_spent={old_spent}, amount={amount}, new_spent={self.spent}")
 
     def get_remaining(self):
         """
@@ -54,4 +59,5 @@ class Budget:
 
         :return: Chaîne de caractères représentant le budget
         """
-        return f"Budget pour {self.category}: {self.amount}€ (Dépensé: {self.spent}€, Restant: {self.get_remaining()}€)"
+        return f"Budget pour {self.category}: {self.amount}€ (Dépensé: {abs(self.spent)}€, Restant: {self.get_remaining()}€)"
+

@@ -51,3 +51,27 @@ def test_get_transactions_for_period(finance_manager):
     transactions = finance_manager.get_transactions_for_period(now - timedelta(days=2), now)
     assert len(transactions) == 1
     assert transactions[0].amount == 100
+
+def test_delete_transaction(finance_manager):
+    transaction = finance_manager.add_transaction(100, "Income", "Salary")
+    assert len(finance_manager.user.transactions) == 1
+    deleted_transaction = finance_manager.delete_transaction(transaction.transaction_id)
+    assert deleted_transaction == transaction
+    assert len(finance_manager.user.transactions) == 0
+    assert "Income" not in finance_manager.categories
+
+def test_delete_nonexistent_transaction(finance_manager):
+    assert finance_manager.delete_transaction(999) is None
+
+def test_update_transaction(finance_manager):
+    transaction = finance_manager.add_transaction(100, "Income", "Salary")
+    updated_transaction = finance_manager.update_transaction(transaction.transaction_id, 150, "Bonus", "Year-end bonus")
+    assert updated_transaction is not None
+    assert updated_transaction.amount == 150
+    assert updated_transaction.category == "Bonus"
+    assert updated_transaction.description == "Year-end bonus"
+    assert "Bonus" in finance_manager.categories
+    assert "Income" not in finance_manager.categories
+
+def test_update_nonexistent_transaction(finance_manager):
+    assert finance_manager.update_transaction(999, 100, "Test", "Test") is None

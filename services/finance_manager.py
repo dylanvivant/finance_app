@@ -1,6 +1,6 @@
 from models.transaction import Transaction
 from models.user import User
-from typing import List, Dict
+from typing import List, Dict, Optional
 from datetime import datetime
 
 class FinanceManager:
@@ -75,3 +75,46 @@ class FinanceManager:
         :return: Une liste des transactions dans la période spécifiée
         """
         return [t for t in self.user.transactions if start_date <= t.date <= end_date]
+    
+    def delete_transaction(self, transaction_id: int) -> Optional[Transaction]:
+        """
+        Supprime une transaction de l'utilisateur.
+        
+        :param transaction_id: L'ID de la transaction à supprimer
+        :return: La transaction supprimée ou None si non trouvée
+        """
+        for i, transaction in enumerate(self.user.transactions):
+            if transaction.transaction_id == transaction_id:
+                deleted_transaction = self.user.transactions.pop(i)
+                
+                # Mise à jour des catégories si nécessaire
+                if not any(t.category == deleted_transaction.category for t in self.user.transactions):
+                    self.categories.remove(deleted_transaction.category)
+                
+                return deleted_transaction
+        return None
+
+    def update_transaction(self, transaction_id: int, amount: float, category: str, description: str) -> Optional[Transaction]:
+        """
+        Met à jour une transaction existante.
+        
+        :param transaction_id: L'ID de la transaction à mettre à jour
+        :param amount: Le nouveau montant
+        :param category: La nouvelle catégorie
+        :param description: La nouvelle description
+        :return: La transaction mise à jour ou None si non trouvée
+        """
+        for transaction in self.user.transactions:
+            if transaction.transaction_id == transaction_id:
+                old_category = transaction.category
+                transaction.amount = amount
+                transaction.category = category
+                transaction.description = description
+                
+                # Mise à jour des catégories si nécessaire
+                self.categories.add(category)
+                if not any(t.category == old_category for t in self.user.transactions):
+                    self.categories.remove(old_category)
+                
+                return transaction
+        return None

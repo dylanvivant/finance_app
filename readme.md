@@ -18,8 +18,8 @@ finance_app/
 ├── models/                 # Modèles de données
 │   ├── user.py
 │   ├── transaction.py
-│   ├── budget.py
-│   └── stock.py
+│   └── budget.py
+│
 │
 ├── services/               # Services métier
 │   ├── finance_manager.py
@@ -29,33 +29,37 @@ finance_app/
 │
 ├── gui/                    # Interface graphique
 │   ├── main_window.py
-│   ├── finance_view.py
-│   └── stock_view.py
+│   └── finance_view.py
+│
 │
 └── data/                   # Stockage des données
-    ├── user_data.json
-    └── stock_data.json
+    └── user_data.json
 ```
 
 ## Fonctionnalités Principales
 
 1. Gestion des finances personnelles
 
-   - Suivi des revenus et dépenses
-   - Catégorisation des transactions
-   - Budgétisation et objectifs financiers
-   - Rapports et prévisions
+   - Suivi détaillé des revenus et dépenses
+   - Catégorisation flexible des transactions
+   - Ajout, modification et suppression de transactions
 
-2. Simulation du marché boursier
+2. Budgétisation
 
-   - Achat et vente d'actions simulés
-   - Suivi du portefeuille
-   - Historique des transactions
+   - Création et gestion de budgets par catégorie
+   - Suivi en temps réel des dépenses par rapport aux budgets fixés
+   - Alertes de dépassement de budget
 
-3. Interface graphique utilisateur
-   - Tableau de bord financier
-   - Visualisation des données et graphiques
-   - Interface de trading simulé
+3. Analyse Financière
+
+   - Génération de rapports financiers
+   - Visualisation des tendances de dépenses et revenus
+   - Prévisions financières basées sur l'historique
+
+4. Interface graphique utilisateur
+   - Tableau de bord financier intuitif
+   - Graphiques et visualisations des données financières
+   - Vue d'ensemble rapide de la santé financière
 
 ## Workflow Git et Nomenclature des Branches
 
