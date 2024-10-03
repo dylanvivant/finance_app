@@ -5,6 +5,7 @@
 Cette application Python est conçue pour la gestion des finances personnelles. Elle permet aux utilisateurs de suivre leurs revenus, dépenses et de gérer leurs budgets. L'application offre une interface utilisateur intuitive construite avec Streamlit.
 
 ## Architecture du Projet
+
 finance_app/
 │
 ├── app.py                  # Interface utilisateur Streamlit
