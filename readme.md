@@ -80,9 +80,55 @@ Voir `requirements.txt` pour la liste complète et les versions spécifiques des
 
 ## Développement Futur
 
-- Intégration de la gestion de budget
-- Amélioration des visualisations et des analyses financières
-- Ajout de fonctionnalités de prévision financière
+## Roadmap du Projet
+
+```mermaid
+gantt
+    title Roadmap du Projet de Gestion des Finances Personnelles
+    dateFormat  YYYY-MM-DD
+    section Phase 1 : Fondations
+    Architecture de base             :done,    des1, 2023-01-01, 30d
+    Gestion des utilisateurs         :done,    des2, after des1, 30d
+    Interface utilisateur Streamlit  :done,    des3, after des2, 30d
+    Transactions de base             :done,    des4, after des3, 30d
+    Visualisation simple             :done,    des5, after des4, 30d
+    Rapports CSV basiques            :done,    des6, after des5, 30d
+
+    section Phase 2 : Amélioration
+    Catégories personnalisables      :active,  des7, 2023-07-01, 45d
+    Budgétisation par catégorie      :         des8, after des7, 45d
+    Alertes de dépassement           :         des9, after des8, 30d
+    Graphiques interactifs           :         des10, after des9, 45d
+    Tableau de bord personnalisable  :         des11, after des10, 45d
+
+    section Phase 3 : Analyses Avancées
+    Analyse de tendances             :         des12, 2024-01-01, 60d
+    Prévisions financières           :         des13, after des12, 60d
+    Objectifs financiers             :         des14, after des13, 45d
+    Rapports détaillés               :         des15, after des14, 45d
+    Calendrier financier             :         des16, after des15, 45d
+
+    section Phase 4 : Intégration
+    Développement API                :         des17, 2024-07-01, 60d
+    Import auto transactions         :         des18, after des17, 60d
+    Synchro multi-appareils          :         des19, after des18, 45d
+    Intégration cryptomonnaies       :         des20, after des19, 60d
+
+    section Phase 5 : Fonctions Avancées
+    Simulation d'investissements     :         des21, 2025-01-01, 60d
+    Conseils IA                      :         des22, after des21, 75d
+    Version mobile                   :         des23, after des22, 90d
+    Planification retraite           :         des24, after des23, 60d
+    Gestion des dettes               :         des25, after des24, 60d
+
+    section Phase 6 : Optimisation
+    Optimisation performances        :         des26, 2025-07-01, 2026-12-31
+    Amélioration UX                  :         des27, 2025-07-01, 2026-12-31
+    Tests automatisés                :         des28, 2025-07-01, 2026-12-31
+    Sécurité avancée                 :         des29, 2025-07-01, 2026-12-31
+    Scaling infrastructure           :         des30, 2025-07-01, 2026-12-31
+
+```
 
 ## Contribution
 
