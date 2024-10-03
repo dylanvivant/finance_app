@@ -11,6 +11,7 @@ finance_app/
 ├── app.py                  # Interface utilisateur Streamlit
 ├── main.py                 # Point d'entrée de l'application
 ├── config.py               # Configuration globale
+│
 ├── utils/                  # Utilitaires
 │   ├── file_handlers.py
 │   └── data_processing.py
@@ -27,7 +28,7 @@ finance_app/
 │   └── user_manager.py
 │
 └── data/                   # Stockage des données
-└── user_data.json
+    └── user_data.json
 
 ## Fonctionnalités Principales
 
