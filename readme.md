@@ -6,6 +6,7 @@ Cette application Python est conçue pour la gestion des finances personnelles. 
 
 ## Architecture du Projet
 
+```
 finance_app/
 │
 ├── app.py                  # Interface utilisateur Streamlit
@@ -29,6 +30,7 @@ finance_app/
 │
 └── data/                   # Stockage des données
     └── user_data.json
+```
 
 ## Fonctionnalités Principales
 
