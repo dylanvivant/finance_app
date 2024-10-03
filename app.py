@@ -9,6 +9,10 @@ from services.app_controller import AppController
 if 'app_controller' not in st.session_state:
     st.session_state.app_controller = AppController()
 
+# Vérification de la session utilisateur
+if 'user' not in st.session_state:
+    st.session_state.user = None
+
 def ajouter_transaction(montant, categorie, transaction_date, est_depense, est_planifiee=False):
     """
     Ajoute une nouvelle transaction en utilisant l'AppController.
@@ -49,25 +53,75 @@ def ajouter_transaction(montant, categorie, transaction_date, est_depense, est_p
 # Titre de l'application
 st.title("Gestion des Finances Personnelles")
 
-# Gestion de la connexion utilisateur
-if not st.session_state.app_controller.current_user:
-    # Affichage du formulaire de connexion si l'utilisateur n'est pas connecté
-    username = st.text_input("Nom d'utilisateur")
-    password = st.text_input("Mot de passe", type="password")
-    if st.button("Se connecter"):
-        if st.session_state.app_controller.login(username, password):
-            st.success("Connexion réussie!")
-        else:
-            st.error("Nom d'utilisateur ou mot de passe incorrect.")
+# Gestion de la connexion et création de compte utilisateur
+if not st.session_state.user:
+    st.header("Connexion ou Création de compte")
+
+    # Initialiser l'état du formulaire s'il n'existe pas
+    if 'show_login' not in st.session_state:
+        st.session_state.show_login = True
+
+    # Bouton pour basculer entre connexion et création de compte
+    if st.session_state.show_login:
+        if st.button("Pas encore de compte ? Créez-en un !"):
+            st.session_state.show_login = False
+            st.rerun()
+    else:
+        if st.button("Déjà un compte ? Connectez-vous !"):
+            st.session_state.show_login = True
+            st.rerun()
+
+    # Afficher le formulaire approprié
+    if st.session_state.show_login:
+        st.subheader("Connexion")
+        login_username = st.text_input("Nom d'utilisateur", key="login_username")
+        login_password = st.text_input("Mot de passe", type="password", key="login_password")
+        if st.button("Se connecter"):
+            user = st.session_state.app_controller.login(login_username, login_password)
+            if user:
+                st.session_state.user = user
+                st.success("Connexion réussie!")
+                st.rerun()
+            else:
+                st.error("Nom d'utilisateur ou mot de passe incorrect.")
+    else:
+        st.subheader("Création de compte")
+        new_username = st.text_input("Choisissez un nom d'utilisateur", key="new_username")
+        new_email = st.text_input("Adresse e-mail", key="new_email")
+        new_password = st.text_input("Choisissez un mot de passe", type="password", key="new_password")
+        confirm_password = st.text_input("Confirmez le mot de passe", type="password", key="confirm_password")
+        if st.button("Créer un compte"):
+            if new_password != confirm_password:
+                st.error("Les mots de passe ne correspondent pas.")
+            elif st.session_state.app_controller.create_account(new_username, new_email, new_password):
+                user = st.session_state.app_controller.login(new_username, new_password)
+                if user:
+                    st.session_state.user = user
+                    st.success("Compte créé avec succès! Vous êtes maintenant connecté.")
+                    st.rerun()
+            else:
+                st.error("Ce nom d'utilisateur existe déjà ou une erreur s'est produite.")
+
 else:
     # Affichage des informations de l'utilisateur connecté et option de déconnexion
-    st.write(f"Connecté en tant que : {st.session_state.app_controller.current_user.username}")
+    if hasattr(st.session_state.user, 'username'):
+        st.write(f"Connecté en tant que : {st.session_state.user.username}")
+    else:
+        st.error("Erreur : Informations utilisateur invalides")
+        st.session_state.user = None
+        st.rerun()
+
     if st.button("Se déconnecter"):
         st.session_state.app_controller.logout()
-        st.experimental_rerun()
+        st.session_state.user = None
+        st.rerun()
 
 # Le reste du code ne s'exécute que si l'utilisateur est connecté
-if st.session_state.app_controller.current_user:
+if st.session_state.user:
+
+    # Affichage du solde
+    solde = st.session_state.app_controller.get_balance()
+    st.header(f"Votre solde actuel est de : {solde:.2f}€")
     # Formulaire pour ajouter une nouvelle transaction
     st.header("Ajouter une nouvelle transaction")
     montant = st.number_input("Montant de la transaction (€)", min_value=0.01, step=0.01)
@@ -80,6 +134,11 @@ if st.session_state.app_controller.current_user:
     if st.button("Ajouter transaction"):
         if ajouter_transaction(montant, categorie, transaction_date, est_depense, transaction_planifiee):
             st.success("Transaction ajoutée avec succès!")
+            # Mise à jour du solde après l'ajout de la transaction
+            nouveau_solde = st.session_state.app_controller.get_balance()
+            st.write(f"Nouveau solde : {nouveau_solde:.2f}€")
+            # Recharger la page pour mettre à jour l'affichage du solde
+            st.rerun()
 
     # Affichage du tableau des transactions récentes
     st.header("Transactions récentes")

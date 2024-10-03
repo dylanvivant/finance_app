@@ -25,22 +25,26 @@ class AppController:
 
     def create_account(self, username, email, password):
         """
-        Crée un nouveau compte utilisateur.
+        Crée un nouveau compte utilisateur et connecte l'utilisateur automatiquement.
 
         :param username: Nom d'utilisateur
         :param email: Adresse email de l'utilisateur
         :param password: Mot de passe de l'utilisateur
-        :return: True si le compte a été créé, False sinon
+        :return: True si le compte a été créé et l'utilisateur connecté, False sinon
         """
-        return self.user_manager.create_user(username, email, password)
+        if self.user_manager.create_user(username, email, password):
+            # Si la création du compte réussit, on connecte automatiquement l'utilisateur
+            return self.login(username, password)
+        return False
+    
 
     def login(self, username, password):
         """
-        Authentifie un utilisateur et charge ses données.
+        Connecte un utilisateur existant.
 
         :param username: Nom d'utilisateur
         :param password: Mot de passe de l'utilisateur
-        :return: True si l'authentification réussit, False sinon
+        :return: True si l'utilisateur a été connecté, False sinon
         """
         if self.user_manager.authenticate(username, password):
             user_data = self.user_manager.get_user_data(username)
@@ -49,8 +53,8 @@ class AppController:
                 self.finance_manager = FinanceManager(self.current_user)
                 self.budget_manager = BudgetManager(self.current_user)
                 self.load_user_data(user_data)
-                return True
-        return False
+                return self.current_user  # Retourne l'objet utilisateur
+        return None
 
     def load_user_data(self, user_data):
         """
@@ -124,13 +128,15 @@ class AppController:
         self.save_user_data()
         return transaction
 
+# Dans app_controller.py
+
     def get_balance(self):
         """
         Récupère le solde actuel de l'utilisateur.
-
-        :return: Le solde actuel
         """
-        return self.finance_manager.get_balance()
+        if self.finance_manager:
+            return self.finance_manager.get_balance()
+        return 0  # Retourne 0 si le finance_manager n'est pas initialisé
 
     def get_budget_status(self):
         """
