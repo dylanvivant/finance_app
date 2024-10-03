@@ -3,105 +3,139 @@ import pandas as pd
 import matplotlib.pyplot as plt
 from datetime import datetime, date
 import io
+from services.app_controller import AppController
 
-# na- Initialisation des données
-if 'transactions' not in st.session_state:
-    st.session_state.transactions = []
+# Initialisation de l'AppController
+if 'app_controller' not in st.session_state:
+    st.session_state.app_controller = AppController()
 
-if 'solde' not in st.session_state:
-    st.session_state.solde = 0
-
-if 'seuil_bas' not in st.session_state:
-    st.session_state.seuil_bas = -100  # na- Définir le seuil bas
-
-# na- Fonction pour ajouter une transaction
-def ajouter_transaction(montant, categorie, transaction_date, est_planifiee=False):
-    # na- Vérification si la date est antérieure à aujourd'hui
+def ajouter_transaction(montant, categorie, transaction_date, est_depense, est_planifiee=False):
+    """
+    Ajoute une nouvelle transaction en utilisant l'AppController.
+    
+    :param montant: Le montant de la transaction
+    :param categorie: La catégorie de la transaction
+    :param transaction_date: La date de la transaction
+    :param est_depense: Indique si la transaction est une dépense
+    :param est_planifiee: Indique si la transaction est planifiée ou non
+    :return: True si la transaction a été ajoutée avec succès, False sinon
+    """
+    # Vérification de la date pour les transactions planifiées
     if est_planifiee and transaction_date < date.today():
         st.error("Erreur : Vous ne pouvez pas planifier une transaction dans le passé.")
         return False
 
-    # na- Formatage de la transaction
-    transaction = {
-        'Date': transaction_date.strftime('%Y-%m-%d'),
-        'Montant': montant,  # na- On garde le montant comme un nombre pour les calculs
-        'Catégorie': categorie
-    }
+    # Conversion de la date en objet datetime
+    if not isinstance(transaction_date, datetime):
+        transaction_date = datetime.combine(transaction_date, datetime.min.time())
 
-    # na- Statut de la transaction
-    if est_planifiee:
-        transaction['Statut'] = 'Planifiée'
-    else:
-        transaction['Statut'] = 'Effectuée'
-        st.session_state.solde += montant  # na- Mise à jour du solde pour les transactions effectuées
+    # Si c'est une dépense, on rend le montant négatif
+    if est_depense:
+        montant = -abs(montant)
 
-    st.session_state.transactions.append(transaction)
+    transaction = st.session_state.app_controller.add_transaction(
+        amount=montant,
+        category=categorie,
+        date=transaction_date,
+        description="Transaction ajoutée via l'interface utilisateur"
+    )
 
-    # na- Vérification du seuil bas si la transaction est effectuée
-    if not est_planifiee and st.session_state.solde < st.session_state.seuil_bas:
-        st.warning(f"Attention : Votre solde est inférieur au seuil bas de {st.session_state.seuil_bas} !")
-    
-    return True
+    if transaction:
+        if not est_planifiee and st.session_state.app_controller.check_low_balance():
+            st.warning(f"Attention : Votre solde est inférieur au seuil bas de {st.session_state.app_controller.get_low_threshold()} !")
+        return True
+    return False
 
-# na- Titre de l'application
+# Titre de l'application
 st.title("Gestion des Finances Personnelles")
 
-# na- Formulaire pour ajouter une transaction
-st.header("Ajouter une nouvelle transaction")
-montant = st.number_input("Montant de la transaction (€)", min_value=0.0)
-categorie = st.selectbox("Catégorie", ["Courses", "Divertissement", "Voyage", "Restaurants", 
-                                       "Virements", "Transport", "Santé", "Achat", "Services", "Autre"])
-
-# na- Ajout d'une date pour la transaction (aujourd'hui par défaut)
-transaction_date = st.date_input("Date de la transaction", value=date.today())
-transaction_planifiee = st.checkbox("Transaction planifiée ?")  # na- Case à cocher pour une transaction planifiée
-
-# na- Bouton pour ajouter la transaction
-if st.button("Ajouter transaction"):
-    if ajouter_transaction(montant, categorie, transaction_date, transaction_planifiee):
-        st.success("Transaction ajoutée avec succès!")
-
-# na- Affichage du tableau des transactions
-st.header("Transactions récentes")
-if len(st.session_state.transactions) > 0:
-    df = pd.DataFrame(st.session_state.transactions)
-    
-    # na- Format d'affichage : Ajout du symbole "€" pour l'affichage, sans modifier les montants dans les calculs
-    df_display = df.copy()
-    df_display['Montant (€)'] = df_display['Montant'].apply(lambda x: f"{x:.2f}€")
-    
-    st.write(df_display[['Date', 'Montant (€)', 'Catégorie', 'Statut']])
+# Gestion de la connexion utilisateur
+if not st.session_state.app_controller.current_user:
+    # Affichage du formulaire de connexion si l'utilisateur n'est pas connecté
+    username = st.text_input("Nom d'utilisateur")
+    password = st.text_input("Mot de passe", type="password")
+    if st.button("Se connecter"):
+        if st.session_state.app_controller.login(username, password):
+            st.success("Connexion réussie!")
+        else:
+            st.error("Nom d'utilisateur ou mot de passe incorrect.")
 else:
-    st.write("Aucune transaction pour l'instant.")
+    # Affichage des informations de l'utilisateur connecté et option de déconnexion
+    st.write(f"Connecté en tant que : {st.session_state.app_controller.current_user.username}")
+    if st.button("Se déconnecter"):
+        st.session_state.app_controller.logout()
+        st.experimental_rerun()
 
-# na- Visualisation des données avec Matplotlib
-st.header("Visualisation des Dépenses")
-if len(st.session_state.transactions) > 0:
-    df_effectuees = df[df['Statut'] == 'Effectuée']  # na- Visualiser uniquement les transactions effectuées
-    if len(df_effectuees) > 0:
-        fig, ax = plt.subplots()
-        df_effectuees.groupby('Catégorie')['Montant'].sum().plot(kind='pie', autopct='%1.1f%%', ax=ax)
-        ax.set_ylabel('')
+# Le reste du code ne s'exécute que si l'utilisateur est connecté
+if st.session_state.app_controller.current_user:
+    # Formulaire pour ajouter une nouvelle transaction
+    st.header("Ajouter une nouvelle transaction")
+    montant = st.number_input("Montant de la transaction (€)", min_value=0.0)
+    categorie = st.selectbox("Catégorie", ["Courses", "Divertissement", "Voyage", "Restaurants", 
+                                           "Virements", "Transport", "Santé", "Achat", "Services", "Autre"])
+    transaction_date = st.date_input("Date de la transaction", value=date.today())
+    transaction_planifiee = st.checkbox("Transaction planifiée ?")
+
+    if st.button("Ajouter transaction"):
+        if ajouter_transaction(montant, categorie, transaction_date, transaction_planifiee):
+            st.success("Transaction ajoutée avec succès!")
+
+    # Affichage du tableau des transactions récentes
+    st.header("Transactions récentes")
+    transactions = st.session_state.app_controller.get_transactions()
+    if transactions:
+        # Création d'un DataFrame à partir des transactions
+        df = pd.DataFrame([t.to_dict() for t in transactions])
+        df['Montant (€)'] = df['amount'].apply(lambda x: f"{x:.2f}€")
+        st.write(df[['date', 'Montant (€)', 'category']])
+    else:
+        st.write("Aucune transaction pour l'instant.")
+
+    # Visualisation des données avec Matplotlib
+    st.header("Visualisation des Dépenses et Revenus")
+    if transactions:
+        df = pd.DataFrame([t.to_dict() for t in transactions])
+        
+        # Séparation des dépenses et des revenus
+        expenses = df[df['amount'] < 0].copy()
+        incomes = df[df['amount'] > 0].copy()
+        
+        # Conversion des dépenses en valeurs positives pour la visualisation
+        expenses['amount'] = expenses['amount'].abs()
+        
+        fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(15, 7))
+        
+        # Graphique des dépenses
+        if not expenses.empty:
+            expenses.groupby('category')['amount'].sum().plot(kind='pie', autopct='%1.1f%%', ax=ax1, title='Répartition des Dépenses')
+        else:
+            ax1.text(0.5, 0.5, 'Pas de dépenses', ha='center', va='center')
+        ax1.set_ylabel('')
+        
+        # Graphique des revenus
+        if not incomes.empty:
+            incomes.groupby('category')['amount'].sum().plot(kind='pie', autopct='%1.1f%%', ax=ax2, title='Répartition des Revenus')
+        else:
+            ax2.text(0.5, 0.5, 'Pas de revenus', ha='center', va='center')
+        ax2.set_ylabel('')
+        
         st.pyplot(fig)
-else:
-    st.write("Aucune transaction pour générer un graphique.")
+    else:
+        st.write("Aucune transaction pour générer un graphique.")
 
-# na- Génération du rapport CSV avec bordures et colonnes séparées (Date, Montant, Catégorie)
-st.header("Génération de rapport")
-if len(st.session_state.transactions) > 0:
-    # na- Sélectionner uniquement les colonnes utiles pour le rapport
-    df_report = df[['Date', 'Montant', 'Catégorie']]
+    # Génération et téléchargement du rapport CSV
+    st.header("Génération de rapport")
+    if transactions:
+        df_report = df[['date', 'amount', 'category']]
+        csv_buffer = io.StringIO()
+        df_report['amount'] = df_report['amount'].apply(lambda x: f"{x:.2f}€")
+        df_report.to_csv(csv_buffer, index=False, sep=',')
 
-    # na- Création du fichier CSV propre avec les bordures pour Excel
-    csv_buffer = io.StringIO()
-    df_report['Montant'] = df_report['Montant'].apply(lambda x: f"{x:.2f}€")  # Ajouter € aux montants dans le CSV
-    df_report.to_csv(csv_buffer, index=False, sep=',')
-
-    st.download_button(
-        label="Télécharger rapport CSV",
-        data=csv_buffer.getvalue(),
-        file_name=f"rapport_financier_{datetime.now().strftime('%Y_%m')}.csv",
-        mime='text/csv',
-    )
-else:
-    st.write("Aucune transaction pour générer un rapport.")
+        st.download_button(
+            label="Télécharger rapport CSV",
+            data=csv_buffer.getvalue(),
+            file_name=f"rapport_financier_{datetime.now().strftime('%Y_%m')}.csv",
+            mime='text/csv',
+        )
+    else:
+        st.write("Aucune transaction pour générer un rapport.")

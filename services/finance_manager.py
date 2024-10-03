@@ -17,25 +17,30 @@ class FinanceManager:
         self.user = user
         self.categories = set()  # Ensemble pour stocker les catégories uniques
 
-    def add_transaction(self, amount: float, category: str, description: str = "") -> Transaction:
+    def add_transaction(self, amount, category, description="", date=None):
         """
         Ajoute une nouvelle transaction pour l'utilisateur.
         
-        :param amount: Le montant de la transaction (positif pour les revenus, négatif pour les dépenses)
+        :param amount: Le montant de la transaction
         :param category: La catégorie de la transaction
         :param description: Une description optionnelle de la transaction
+        :param date: La date de la transaction (optionnel)
         :return: La transaction créée
         """
+        transaction_id = len(self.user.transactions) + 1
         transaction = Transaction(
-            transaction_id=len(self.user.transactions) + 1,
+            transaction_id=transaction_id,
             user_id=self.user.user_id,
             amount=amount,
             category=category,
-            description=description
+            description=description,
+            date=date
         )
         self.user.add_transaction(transaction)
-        self.categories.add(category)
+        self.categories.add(category)  # Ajout de la catégorie à l'ensemble des catégories
         return transaction
+
+    # Les méthodes suivantes restent inchangées
 
     def get_balance(self) -> float:
         """

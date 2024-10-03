@@ -1,1 +1,68 @@
-[{}]
+{
+  "user1": {
+    "email": "user1@example.com",
+    "password": "password123",
+    "transactions": [
+      {
+        "transaction_id": 1,
+        "user_id": "user1",
+        "amount": -50.0,
+        "category": "Alimentation",
+        "description": "Courses hebdomadaires",
+        "date": "2024-10-01T10:30:00"
+      },
+      {
+        "transaction_id": 2,
+        "user_id": "user1",
+        "amount": 1000.0,
+        "category": "Salaire",
+        "description": "Salaire mensuel",
+        "date": "2024-10-05T09:00:00"
+      },
+      {
+        "transaction_id": 3,
+        "user_id": 1,
+        "amount": 10.0,
+        "category": "Courses",
+        "description": "Transaction ajout\u00e9e via l'interface utilisateur",
+        "date": "2024-10-03T00:00:00"
+      },
+      {
+        "transaction_id": 4,
+        "user_id": 1,
+        "amount": 100.0,
+        "category": "Restaurants",
+        "description": "Transaction ajout\u00e9e via l'interface utilisateur",
+        "date": "2024-10-03T00:00:00"
+      },
+      {
+        "transaction_id": 5,
+        "user_id": 1,
+        "amount": -100.0,
+        "category": "Courses",
+        "description": "Transaction ajout\u00e9e via l'interface utilisateur",
+        "date": "2024-10-03T00:00:00"
+      }
+    ],
+    "budgets": [
+      {
+        "budget_id": 1,
+        "user_id": "user1",
+        "category": "Alimentation",
+        "amount": 300.0,
+        "period_start": "2024-10-01T00:00:00",
+        "period_end": "2024-10-31T23:59:59",
+        "spent": 50.0
+      },
+      {
+        "budget_id": 2,
+        "user_id": "user1",
+        "category": "Loisirs",
+        "amount": 200.0,
+        "period_start": "2024-10-01T00:00:00",
+        "period_end": "2024-10-31T23:59:59",
+        "spent": 0.0
+      }
+    ]
+  }
+}

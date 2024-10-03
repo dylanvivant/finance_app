@@ -25,7 +25,8 @@ finance_app/
 ├── services/               # Services métier
 │   ├── finance_manager.py
 │   ├── budget_manager.py
-│   └── forecasting.py
+│   ├── forecasting.py
+│   └── user_manager.py
 │
 ├── gui/                    # Interface graphique
 │   ├── main_window.py

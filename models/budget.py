@@ -1,13 +1,12 @@
 from datetime import datetime
 import logging
 
-
 class Budget:
     """
     Classe représentant un budget pour une catégorie spécifique.
     """
 
-    def __init__(self, budget_id, user_id, category, amount, period_start, period_end):
+    def __init__(self, budget_id, user_id, category, amount, period_start, period_end, spent=0):
         """
         Initialise un nouveau budget.
 
@@ -17,6 +16,7 @@ class Budget:
         :param amount: Montant alloué pour ce budget
         :param period_start: Date de début de la période du budget
         :param period_end: Date de fin de la période du budget
+        :param spent: Montant déjà dépensé (par défaut 0)
         """
         self.budget_id = budget_id
         self.user_id = user_id
@@ -24,14 +24,14 @@ class Budget:
         self.amount = amount
         self.period_start = period_start
         self.period_end = period_end
-        self.spent = 0
+        self.spent = spent
         logging.debug(f"Budget initialized: {self}")
 
     def add_expense(self, amount):
         """
         Ajoute une dépense au budget.
 
-        :param amount: Montant de la dépense à ajouter (devrait être négatif)
+        :param amount: Montant de la dépense à ajouter (devrait être positif)
         """
         old_spent = self.spent
         self.spent += amount
@@ -53,11 +53,38 @@ class Budget:
         """
         return self.spent > self.amount
 
+    def to_dict(self):
+        """
+        Convertit l'objet Budget en dictionnaire pour la sérialisation.
+
+        :return: Un dictionnaire représentant le budget
+        """
+        return {
+            'budget_id': self.budget_id,
+            'user_id': self.user_id,
+            'category': self.category,
+            'amount': self.amount,
+            'period_start': self.period_start.isoformat(),
+            'period_end': self.period_end.isoformat(),
+            'spent': self.spent
+        }
+
+    @classmethod
+    def from_dict(cls, data):
+        """
+        Crée une instance de Budget à partir d'un dictionnaire.
+
+        :param data: Dictionnaire contenant les données du budget
+        :return: Une nouvelle instance de Budget
+        """
+        data['period_start'] = datetime.fromisoformat(data['period_start'])
+        data['period_end'] = datetime.fromisoformat(data['period_end'])
+        return cls(**data)
+
     def __str__(self):
         """
         Retourne une représentation en chaîne de caractères du budget.
 
         :return: Chaîne de caractères représentant le budget
         """
-        return f"Budget pour {self.category}: {self.amount}€ (Dépensé: {abs(self.spent)}€, Restant: {self.get_remaining()}€)"
-
+        return f"Budget pour {self.category}: {self.amount}€ (Dépensé: {self.spent}€, Restant: {self.get_remaining()}€)"
