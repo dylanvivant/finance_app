@@ -9,6 +9,7 @@ Cette application Python combine la gestion des finances personnelles avec un si
 ```
 finance_app/
 │
+├── app.py                  # Lancement de l'application
 ├── main.py                 # Point d'entrée de l'application
 ├── config.py               # Configuration globale
 ├── utils/                  # Utilitaires
