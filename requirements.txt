@@ -30,3 +30,5 @@ flake8==6.1.0
 
 # Environment variables
 python-dotenv==1.0.0
+
+matplotlib==3.9.2
