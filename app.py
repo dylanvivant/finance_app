@@ -70,14 +70,15 @@ else:
 if st.session_state.app_controller.current_user:
     # Formulaire pour ajouter une nouvelle transaction
     st.header("Ajouter une nouvelle transaction")
-    montant = st.number_input("Montant de la transaction (€)", min_value=0.0)
+    montant = st.number_input("Montant de la transaction (€)", min_value=0.01, step=0.01)
     categorie = st.selectbox("Catégorie", ["Courses", "Divertissement", "Voyage", "Restaurants", 
                                            "Virements", "Transport", "Santé", "Achat", "Services", "Autre"])
     transaction_date = st.date_input("Date de la transaction", value=date.today())
+    est_depense = st.checkbox("Est-ce une dépense ?")
     transaction_planifiee = st.checkbox("Transaction planifiée ?")
 
     if st.button("Ajouter transaction"):
-        if ajouter_transaction(montant, categorie, transaction_date, transaction_planifiee):
+        if ajouter_transaction(montant, categorie, transaction_date, est_depense, transaction_planifiee):
             st.success("Transaction ajoutée avec succès!")
 
     # Affichage du tableau des transactions récentes
