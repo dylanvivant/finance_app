@@ -45,6 +45,21 @@ class User:
         """
         return sum(transaction.amount for transaction in self.transactions)
 
+    def to_dict(self):
+        """
+        Convertit l'objet User en dictionnaire pour la sérialisation.
+
+        :return: Un dictionnaire représentant l'utilisateur et ses données
+        """
+        return {
+            'user_id': self.user_id,
+            'username': self.username,
+            'email': self.email,
+            'created_at': self.created_at.isoformat(),
+            'transactions': [t.to_dict() for t in self.transactions],
+            'budgets': [b.to_dict() for b in self.budgets]
+        }
+
     def __str__(self):
         """
         Retourne une représentation en chaîne de caractères de l'utilisateur.
