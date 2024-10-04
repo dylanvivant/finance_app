@@ -128,8 +128,6 @@ class AppController:
         self.save_user_data()
         return transaction
 
-# Dans app_controller.py
-
     def get_balance(self):
         """
         Récupère le solde actuel de l'utilisateur.
